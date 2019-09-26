@@ -37,6 +37,9 @@ object JavaPersonFakeCompanion {
     GenCodec.fromApplyUnapplyProvider[JavaPerson](JavaPersonFakeCompanion)
 }
 
+case class Team(leader: JavaPerson)
+object Team extends RestDataCompanion[Team]
+
 trait EnhancedRestImplicits extends DefaultRestImplicits {
   implicit val javaPersonCodec = JavaPersonFakeCompanion.javaPersonCodec
 }
