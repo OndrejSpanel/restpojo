@@ -10,14 +10,17 @@ import io.udash.rest.openapi.{RestSchema, RestStructure}
 
 case class Team(leader: JavaPerson)
 
-object Team {
+abstract class EnhancedRestDataCompanion {
   type T = Team
   implicit val javaPersonCodec = JavaPersonFakeCompanion.javaPersonCodec
+  //implicit val instances: MacroInstances[DefaultRestImplicits, CodecWithStructure[T]] = MacroInstances.materialize[DefaultRestImplicits, CodecWithStructure[T]]
   implicit val instances: MacroInstances[DefaultRestImplicits, CodecWithStructure[T]] = implicitly[MacroInstances[DefaultRestImplicits, CodecWithStructure[T]]]
   implicit lazy val codec: GenCodec[T] = instances(DefaultRestImplicits, this).codec
   implicit lazy val restStructure: RestStructure[T] = instances(DefaultRestImplicits, this).structure
   implicit lazy val restSchema: RestSchema[T] = RestSchema.lazySchema(restStructure.standaloneSchema)
 }
+
+object Team extends EnhancedRestDataCompanion
 
 trait EnhancedRestImplicits extends DefaultRestImplicits {
   implicit val javaPersonCodec: GenCodec[JavaPerson] = JavaPersonFakeCompanion.javaPersonCodec
