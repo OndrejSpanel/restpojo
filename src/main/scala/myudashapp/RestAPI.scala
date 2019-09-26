@@ -5,38 +5,13 @@ import io.udash.rest.{DefaultRestImplicits, GET, RestApiCompanion, RestDataCompa
 
 import scala.concurrent.Future
 
-class JavaPerson {
-  private var name: String = _
-  private var birthYear = 0
-  def getName = name
-  def setName(name: String) = {
-    this.name = name
-  }
-  def getBirthYear = birthYear
-  def setBirthYear(birthYear: Int) = {
-    this.birthYear = birthYear
-  }
-}
-
-object JavaPersonFakeCompanion {
-  def apply(name: String, birthYear: Int): JavaPerson = {
-    val result = new JavaPerson
-    result.setName(name)
-    result.setBirthYear(birthYear)
-    result
-  }
-  def unapply(javaPerson: JavaPerson): Option[(String, Int)] =
-    Some((javaPerson.getName, javaPerson.getBirthYear))
-
-  implicit val javaPersonCodec: GenCodec[JavaPerson] =
-    GenCodec.fromApplyUnapplyProvider[JavaPerson](JavaPersonFakeCompanion)
-}
+import JavaPersonFakeCompanion._
 
 case class Team(leader: JavaPerson)
 object Team extends RestDataCompanion[Team]
 
 trait EnhancedRestImplicits extends DefaultRestImplicits {
-  implicit val javaPersonCodec = JavaPersonFakeCompanion.javaPersonCodec
+  implicit val javaPersonCodec: GenCodec[JavaPerson] = JavaPersonFakeCompanion.javaPersonCodec
 }
 
 object EnhancedRestImplicits extends EnhancedRestImplicits
