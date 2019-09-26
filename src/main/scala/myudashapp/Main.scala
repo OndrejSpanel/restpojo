@@ -1,7 +1,14 @@
 package myudashapp
 
+import java.time.ZonedDateTime
+
+import com.avsystem.commons.rpc.AsRawReal
 import com.avsystem.commons.serialization.GenCodec
 import com.avsystem.commons.serialization.json.JsonStringOutput
+import io.udash.rest.raw.{JsonValue, PlainValue}
+import io.udash.rest.{DefaultRestImplicits, GET, RestApiCompanion, RestDataCompanion}
+
+import scala.concurrent.Future
 
 class JavaPerson {
   private var name: String = _
@@ -29,6 +36,19 @@ object JavaPersonFakeCompanion {
   implicit val javaPersonCodec: GenCodec[JavaPerson] =
     GenCodec.fromApplyUnapplyProvider[JavaPerson](JavaPersonFakeCompanion)
 }
+
+trait EnhancedRestImplicits extends DefaultRestImplicits {
+  implicit val javaPersonCodec = JavaPersonFakeCompanion.javaPersonCodec
+}
+
+object EnhancedRestImplicits extends EnhancedRestImplicits
+
+trait RestAPI {
+  @GET
+  def identity: Future[JavaPerson]
+}
+
+object RestAPI extends RestApiCompanion[EnhancedRestImplicits,RestAPI](EnhancedRestImplicits)
 
 import com.avsystem.commons.jiop.JavaInterop._
 
